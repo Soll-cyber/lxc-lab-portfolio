@@ -9,21 +9,23 @@ Practical LXC container management lab on Ubuntu 26.04 LTS inside a VirtualBox e
 **Goal:** Install LXC tools and initialize a basic unprivileged container.
 
 **Commands:**
+
 ```bash
 sudo apt update && sudo apt install -y lxc lxc-templates bridge-utils
 lxc-create -n container-01 -t download -- -d ubuntu -r noble -a amd64
 lxc-start -n container-01
 lxc-info -n container-01
+```
 Installed LXC package dependencies on Ubuntu 26.04 LTS. Downloaded the official Ubuntu rootfs template and created an unprivileged container named container-01. Verified operational status using lxc-info.
 
-`![Task 1](<Screenshot -1.png>)`
+![Task 1](Screenshot-1.png)
 
 Task 2: Network Configuration
 
 Goal: Configure static networking on the lxcbr0 virtual bridge interface for the LXC container.
 
 Commands:
-Bash
+```bash
 # 1. Edit the container configuration file
 sudo nano /var/lib/lxc/container-01/config
 
@@ -40,7 +42,7 @@ sudo lxc-start -n container-01
 
 # 3. Verify the assigned IP address
 sudo lxc-attach -n container-01 -- ip a
-
+```
 Modified the container configuration file to assign a static IP address (10.0.3.100) on the default lxcbr0 virtual bridge interface. Confirmed network connectivity using ip a via lxc-attach.
 
 ![Task 2](Screenshot-2.png)
