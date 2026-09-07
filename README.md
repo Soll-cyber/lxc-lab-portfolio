@@ -58,32 +58,32 @@ Modified the container configuration file to assign a static IP address (`10.0.3
 ![Task 2](Screenshot-2.png)
 
 
-Task 3: Custom LXC Image Creation
+### Task 3: Custom LXC Image Creation
 
 Goal: Customize a running container and create a reusable template/image.
 
 Commands:
-Bash
+```bash
 sudo lxc-attach -n container-01 -- sh -c "apt update && apt install -y curl vim"
 sudo lxc-stop -n container-01
 sudo lxc-snapshot -n container-01 -L
 sudo lxc-copy -n container-01 -N container-custom -s snap0
 sudo lxc-start -n container-custom
-
+```
 Provisioned base tools (curl, vim) inside container-01. Created a filesystem snapshot named custom-template and cloned it to launch a pre-configured instance (container-custom).
 
 ![Task 3](Screenshot-3.png)
 
-Task 4: Resource Limits Management
+### Task 4: Resource Limits Management
 
 Goal: Restrict CPU cores and RAM usage using Control Groups (cgroups).
 
 Commands:
-Bash
+```bash
 sudo nano /var/lib/lxc/container-01/config
-# Append cgroup limits:
-# lxc.cgroup2.memory.max = 512M
-# lxc.cgroup2.cpu.max = 100000 200000
+Append cgroup limits:
+lxc.cgroup2.memory.max = 512M
+lxc.cgroup2.cpu.max = 100000 200000
 
 sudo lxc-stop -n container-01
 sudo lxc-start -n container-01
@@ -91,7 +91,7 @@ sudo cat /sys/fs/cgroup/lxc.payload.container-01/memory.max
 sudo cat /sys/fs/cgroup/lxc.payload.container-01/cpu.max
 sudo lxc-attach -n container-01 -- df -h /
 sudo lxc-attach -n container-01 -- free -m
-
+```
 Enforced hardware resource constraints using Cgroups v2. Restricted memory allocation to 512MB and limited CPU quota to 50% of a single core.
 
 ![Task 4](Screenshot-4.png)
