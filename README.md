@@ -40,14 +40,14 @@ lxc.net.0.link = lxcbr0
 lxc.net.0.ipv4.address = 10.0.3.100/24
 lxc.net.0.ipv4.gateway = 10.0.3.1
 ```
-# Restart the container to apply network settings
+Restart the container to apply network settings
 
 ```
 sudo lxc-stop -n container-01
 sudo lxc-start -n container-01
 ```
 
-# Verify the assigned IP address
+Verify the assigned IP address
 
 ```
 sudo lxc-attach -n container-01 -- ip a
