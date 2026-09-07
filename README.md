@@ -20,32 +20,44 @@ Installed LXC package dependencies on Ubuntu 26.04 LTS. Downloaded the official 
 
 ![Task 1](Screenshot-1.png)
 
-Task 2: Network Configuration
+### Task 2: Network Configuration
 
-Goal: Configure static networking on the lxcbr0 virtual bridge interface for the LXC container.
+**Goal:** Configure static networking on the `lxcbr0` virtual bridge interface for the LXC container.
 
-Commands:
+**Commands:**
+
 ```bash
 # 1. Edit the container configuration file
 sudo nano /var/lib/lxc/container-01/config
+```
 
 Add/modify the following lines:
+
+```ini
 lxc.net.0.type = veth
 lxc.net.0.flags = up
 lxc.net.0.link = lxcbr0
 lxc.net.0.ipv4.address = 10.0.3.100/24
 lxc.net.0.ipv4.gateway = 10.0.3.1
+```
 
 # 2. Restart the container to apply network settings
+
+```bash
 sudo lxc-stop -n container-01
 sudo lxc-start -n container-01
+```
 
 # 3. Verify the assigned IP address
+
+```bash
 sudo lxc-attach -n container-01 -- ip a
 ```
-Modified the container configuration file to assign a static IP address (10.0.3.100) on the default lxcbr0 virtual bridge interface. Confirmed network connectivity using ip a via lxc-attach.
+
+Modified the container configuration file to assign a static IP address (`10.0.3.100`) on the default `lxcbr0` virtual bridge interface. Confirmed the assigned IP address using `ip a` via `lxc-attach`.
 
 ![Task 2](Screenshot-2.png)
+
 
 Task 3: Custom LXC Image Creation
 
