@@ -27,30 +27,29 @@ Installed LXC package dependencies on Ubuntu 26.04 LTS. Downloaded the official 
 **Commands:**
 
 ```bash
-# 1. Edit the container configuration file
+# Edit the container configuration file
 sudo nano /var/lib/lxc/container-01/config
 ```
 
 Add/modify the following lines:
 
-```ini
+```
 lxc.net.0.type = veth
 lxc.net.0.flags = up
 lxc.net.0.link = lxcbr0
 lxc.net.0.ipv4.address = 10.0.3.100/24
 lxc.net.0.ipv4.gateway = 10.0.3.1
 ```
+# Restart the container to apply network settings
 
-# 2. Restart the container to apply network settings
-
-```bash
+```
 sudo lxc-stop -n container-01
 sudo lxc-start -n container-01
 ```
 
-# 3. Verify the assigned IP address
+# Verify the assigned IP address
 
-```bash
+```
 sudo lxc-attach -n container-01 -- ip a
 ```
 
