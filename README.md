@@ -1,14 +1,15 @@
-LXC-lab-portfolio
-Practical LXC container management lab on Ubuntu 26.04 LTS
+# LXC Lab Portfolio: Hands-On Container Management
 
-LXC Lab Portfolio: Hands-On Container Management
+Practical LXC container management lab on Ubuntu 26.04 LTS inside a VirtualBox environment.
 
-This portfolio demonstrates practical containerization concepts using LXC (Linux Containers) on Ubuntu 26.04 LTS inside a VirtualBox environment.
+---
 
-Task 1: Installation and First Container
-Goal: Install LXC tools and initialize a basic unprivileged container.
-Commands:
-Bash
+### Task 1: Installation and First Container
+
+**Goal:** Install LXC tools and initialize a basic unprivileged container.
+
+**Commands:**
+```bash
 sudo apt update && sudo apt install -y lxc lxc-templates bridge-utils
 lxc-create -n container-01 -t download -- -d ubuntu -r noble -a amd64
 lxc-start -n container-01
@@ -18,19 +19,19 @@ Installed LXC package dependencies on Ubuntu 26.04 LTS. Downloaded the official 
 
 Task 2: Network Configuration
 
-Goal: Configure static networking on the `lxcbr0` virtual bridge interface for the LXC container.
+Goal: Configure static networking on the lxcbr0 virtual bridge interface for the LXC container.
 
 Commands:
 Bash
 # 1. Edit the container configuration file
 sudo nano /var/lib/lxc/container-01/config
 
-# Add/modify the following lines:
-# lxc.net.0.type = veth
-# lxc.net.0.flags = up
-# lxc.net.0.link = lxcbr0
-# lxc.net.0.ipv4.address = 10.0.3.100/24
-# lxc.net.0.ipv4.gateway = 10.0.3.1
+Add/modify the following lines:
+lxc.net.0.type = veth
+lxc.net.0.flags = up
+lxc.net.0.link = lxcbr0
+lxc.net.0.ipv4.address = 10.0.3.100/24
+lxc.net.0.ipv4.gateway = 10.0.3.1
 
 # 2. Restart the container to apply network settings
 sudo lxc-stop -n container-01
