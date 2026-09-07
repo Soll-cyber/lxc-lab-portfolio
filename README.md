@@ -1,4 +1,4 @@
-# lxc-lab-portfolio
+LXC-lab-portfolio
 Practical LXC container management lab on Ubuntu 26.04 LTS
 
 LXC Lab Portfolio: Hands-On Container Management
@@ -6,18 +6,14 @@ LXC Lab Portfolio: Hands-On Container Management
 This portfolio demonstrates practical containerization concepts using LXC (Linux Containers) on Ubuntu 26.04 LTS inside a VirtualBox environment.
 
 Task 1: Installation and First Container
-
 Goal: Install LXC tools and initialize a basic unprivileged container.
-
 Commands:
 Bash
 sudo apt update && sudo apt install -y lxc lxc-templates bridge-utils
 lxc-create -n container-01 -t download -- -d ubuntu -r noble -a amd64
 lxc-start -n container-01
 lxc-info -n container-01
-
 Installed LXC package dependencies on Ubuntu 26.04 LTS. Downloaded the official Ubuntu rootfs template and created an unprivileged container named container-01. Verified operational status using lxc-info.
-
 ![Task 1](Screenshot-1.png)
 
 Task 2: Network Configuration
@@ -151,9 +147,7 @@ Configured host-to-container bind mounting to decouple storage from the containe
 ![Task 8](Screenshot-8.png)
 
 Task 9: Vulnerability Testing Sandbox
-
 Goal: Isolate and test potentially unsafe software inside a sandbox environment.
-
 Commands:
 Bash
 sudo lxc-attach -n container-01 -- apt update
