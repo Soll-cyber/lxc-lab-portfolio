@@ -10,7 +10,7 @@ Task 1: Installation and First Container
 Goal: Install LXC tools and initialize a basic unprivileged container.
 
 Commands:
-```bash
+Bash
 sudo apt update && sudo apt install -y lxc lxc-templates bridge-utils
 lxc-create -n container-01 -t download -- -d ubuntu -r noble -a amd64
 lxc-start -n container-01
@@ -25,7 +25,7 @@ Task 2: Network Configuration
 Goal: Configure static networking on the `lxcbr0` virtual bridge interface for the LXC container.
 
 Commands:
-```bash
+Bash
 # 1. Edit the container configuration file
 sudo nano /var/lib/lxc/container-01/config
 
@@ -52,7 +52,7 @@ Task 3: Custom LXC Image Creation
 Goal: Customize a running container and create a reusable template/image.
 
 Commands:
-```bash
+Bash
 sudo lxc-attach -n container-01 -- sh -c "apt update && apt install -y curl vim"
 sudo lxc-stop -n container-01
 sudo lxc-snapshot -n container-01 -L
@@ -68,7 +68,7 @@ Task 4: Resource Limits Management
 Goal: Restrict CPU cores and RAM usage using Control Groups (cgroups).
 
 Commands:
-```bash
+Bash
 sudo nano /var/lib/lxc/container-01/config
 # Append cgroup limits:
 # lxc.cgroup2.memory.max = 512M
@@ -90,7 +90,7 @@ Task 5: LXC Command Line Toolset Exploration
 Goal: Demonstrate core management utilities in the LXC ecosystem.
 
 Commands:
-```bash
+Bash
 sudo lxc-ls -f
 sudo lxc-top
 sudo lxc-monitor -n "container-.*"
@@ -105,7 +105,7 @@ Task 6: Deploying a Web Server (Nginx)
 Goal: Spin up a web server inside a isolated LXC environment.
 
 Commands:
-```bash
+Bash
 sudo lxc-attach -n container-01 -- apt update && apt install -y nginx
 sudo lxc-attach -n container-01 -- systemctl enable --now nginx
 curl -I http://10.0.3.100
@@ -119,7 +119,7 @@ Task 7: SSH Access Configuration
 Goal: Configure secure remote access directly into the LXC container.
 
 Commands:
-```bash
+Bash
 sudo lxc-attach -n container-01 -- apt update
 sudo lxc-attach -n container-01 -- apt install -y openssh-server
 sudo lxc-attach -n container-01 -- bash -c "echo 'labuser:Password123\!' | chpasswd"
@@ -134,7 +134,7 @@ Task 8: Data Persistence and Bind Mounts
 Goal: Mount host directories inside the container to preserve data across destructions.
 
 Commands:
-```bash
+Bash
 mkdir -p /home/user/lxc-data
 echo "Persistent Storage Test" > /home/user/lxc-data/test.txt
 sudo nano /var/lib/lxc/container-01/config
@@ -155,7 +155,7 @@ Task 9: Vulnerability Testing Sandbox
 Goal: Isolate and test potentially unsafe software inside a sandbox environment.
 
 Commands:
-```bash
+Bash
 sudo lxc-attach -n container-01 -- apt update
 sudo lxc-attach -n container-01 -- apt install -y python3 git
 sudo lxc-attach -n container-01 -- git clone https://github.com/digininja/DVWA /var/www/html/dvwa
