@@ -16,7 +16,7 @@ lxc-start -n container-01
 lxc-info -n container-01
 Installed LXC package dependencies on Ubuntu 26.04 LTS. Downloaded the official Ubuntu rootfs template and created an unprivileged container named container-01. Verified operational status using lxc-info.
 
-![Task 1](Screenshot%20 -1.png)
+`![Task 1](<Screenshot -1.png>)`
 
 Task 2: Network Configuration
 
