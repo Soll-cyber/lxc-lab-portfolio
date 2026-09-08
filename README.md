@@ -119,25 +119,36 @@ Provisioned base tools (curl and vim) inside container-01. Created a filesystem 
 
 ### Task 4: Resource Limits Management
 
-**Goal:** Configure CPU, memory, and storage resource limits using cgroups and LXC configuration.
+**Goal:** Configure CPU and memory resource limits for the LXC container using cgroups v2 and verify the applied limits.
 
 **Commands:**
 ```bash
- # Edit the container configuration file
+# Edit the container configuration file
 sudo nano /var/lib/lxc/container-01/config
 
-Append cgroup limits:
+# Add cgroup limits:
 lxc.cgroup2.memory.max = 512M
 lxc.cgroup2.cpu.max = 100000 200000
 
+# Restart the container
 sudo lxc-stop -n container-01
 sudo lxc-start -n container-01
+
+# Verify the memory limit
 sudo cat /sys/fs/cgroup/lxc.payload.container-01/memory.max
+
+# Verify the CPU quota
 sudo cat /sys/fs/cgroup/lxc.payload.container-01/cpu.max
+
+# Check filesystem usage
 sudo lxc-attach -n container-01 -- df -h /
+
+# Check available memory
 sudo lxc-attach -n container-01 -- free -m
 ```
-Enforced resource limits using cgroups v2. The container's maximum memory usage was restricted to 512 MB, while the CPU quota was limited to 50% of a single CPU core.
+Resource limits were configured using cgroups v2. The container's maximum memory usage was restricted to 512 MB, while the CPU quota was limited to 50% of a single CPU core. The applied limits were verified through the host cgroup filesystem and from inside the container using free and df.
+
+The container uses a filesystem-based storage configuration rather than LVM or ZFS. Therefore, disk usage was monitored using df -h, but no separate filesystem quota was configured in this lab.
 
 ![Task 4](Screenshot-4.png)
 
