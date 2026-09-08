@@ -1,6 +1,45 @@
 # LXC Lab Portfolio: Hands-On Container Management
 
-Practical LXC container management lab on Ubuntu 26.04 LTS inside a VirtualBox environment.
+A hands-on Linux container management project demonstrating the deployment, configuration, monitoring, and security testing of LXC containers on Ubuntu 26.04 LTS running inside VirtualBox.
+
+## Technologies
+
+- Ubuntu 26.04 LTS
+- LXC / LXC tools
+- VirtualBox
+- Linux networking and `lxcbr0`
+- cgroups v2
+- Nginx
+- OpenSSH
+- DVWA
+- Bash
+
+## Objectives
+
+This project demonstrates:
+
+- LXC container creation and lifecycle management
+- Static network configuration
+- Container snapshots and cloning
+- CPU and memory resource limits
+- Container monitoring
+- Nginx deployment
+- SSH configuration
+- Persistent storage using bind mounts
+- Isolated vulnerability testing with DVWA
+
+## Lab Environment
+
+| Component | Configuration |
+|---|---|
+| Host environment | VirtualBox |
+| Operating system | Ubuntu 26.04 LTS |
+| Container runtime | LXC |
+| Container | Ubuntu Noble / amd64 |
+| Container IP | 10.0.3.100 |
+| Network bridge | lxcbr0 |
+| Memory limit | 512 MB |
+| CPU quota | 50% of one CPU |
 
 ---
 
@@ -16,7 +55,8 @@ lxc-create -n container-01 -t download -- -d ubuntu -r noble -a amd64
 lxc-start -n container-01
 lxc-info -n container-01
 ```
-Installed LXC package dependencies on Ubuntu 26.04 LTS. Downloaded the official Ubuntu rootfs template and created an unprivileged container named container-01. Verified operational status using lxc-info.
+Installed LXC package dependencies on Ubuntu 26.04 LTS. Downloaded the official Ubuntu rootfs template and created an LXC container named `container-01`. Verified operational status using `lxc-info`.
+
 
 ![Task 1](Screenshot-1.png)
 
@@ -27,29 +67,21 @@ Installed LXC package dependencies on Ubuntu 26.04 LTS. Downloaded the official 
 **Commands:**
 
 ```bash
-# Edit the container configuration file
+# Edit the container configuration
 sudo nano /var/lib/lxc/container-01/config
-```
 
-Add/modify the following lines:
-
-```
+# Add/modify:
 lxc.net.0.type = veth
 lxc.net.0.flags = up
 lxc.net.0.link = lxcbr0
 lxc.net.0.ipv4.address = 10.0.3.100/24
 lxc.net.0.ipv4.gateway = 10.0.3.1
-```
-Restart the container to apply network settings
 
-```
+# Restart the container
 sudo lxc-stop -n container-01
 sudo lxc-start -n container-01
-```
 
-Verify the assigned IP address
-
-```
+# Verify the IP address
 sudo lxc-attach -n container-01 -- ip a
 ```
 
@@ -60,9 +92,9 @@ Modified the container configuration file to assign a static IP address (`10.0.3
 
 ### Task 3: Custom LXC Image Creation
 
-Goal: Customize a running container and create a reusable template/image.
+**Goal:** Customize a running container and create a reusable template/image.
 
-Commands:
+**Commands:**
 ```bash
 sudo lxc-attach -n container-01 -- sh -c "apt update && apt install -y curl vim"
 sudo lxc-stop -n container-01
@@ -70,17 +102,19 @@ sudo lxc-snapshot -n container-01 -L
 sudo lxc-copy -n container-01 -N container-custom -s snap0
 sudo lxc-start -n container-custom
 ```
-Provisioned base tools (curl, vim) inside container-01. Created a filesystem snapshot named custom-template and cloned it to launch a pre-configured instance (container-custom).
+Provisioned base tools (curl and vim) inside container-01. Created a filesystem snapshot and used it as the source for a cloned container named container-custom. The cloned container was then started successfully.
 
 ![Task 3](Screenshot-3.png)
 
 ### Task 4: Resource Limits Management
 
-Goal: Restrict CPU cores and RAM usage using Control Groups (cgroups).
+**Goal:** Restrict CPU cores and RAM usage using Control Groups (cgroups).
 
-Commands:
+**Commands:**
 ```bash
+ # Edit the container configuration file
 sudo nano /var/lib/lxc/container-01/config
+
 Append cgroup limits:
 lxc.cgroup2.memory.max = 512M
 lxc.cgroup2.cpu.max = 100000 200000
@@ -92,85 +126,110 @@ sudo cat /sys/fs/cgroup/lxc.payload.container-01/cpu.max
 sudo lxc-attach -n container-01 -- df -h /
 sudo lxc-attach -n container-01 -- free -m
 ```
-Enforced hardware resource constraints using Cgroups v2. Restricted memory allocation to 512MB and limited CPU quota to 50% of a single core.
+Enforced resource limits using cgroups v2. The container's maximum memory usage was restricted to 512 MB, while the CPU quota was limited to 50% of one CPU core.
 
 ![Task 4](Screenshot-4.png)
 
-Task 5: LXC Command Line Toolset Exploration
+### Task 5: LXC Command Line Toolset Exploration
 
-Goal: Demonstrate core management utilities in the LXC ecosystem.
+**Goal:** Demonstrate core management utilities in the LXC ecosystem.
 
-Commands:
-Bash
+**Commands:**
+```bash
 sudo lxc-ls -f
 sudo lxc-top
 sudo lxc-monitor -n "container-.*"
 sudo lxc-stop -n container-01
-
-Utilized lxc-ls -f to inspect active states and IP assignments, monitored real-time system metrics using lxc-top, and observed lifecycle events via lxc-monitor.
+```
+Utilized `lxc-ls -f` to inspect active states and IP assignments, monitored real-time system metrics using `lxc-top`, and observed lifecycle events via `lxc-monitor`.
 
 ![Task 5](Screenshot-5.png)
 
-Task 6: Deploying a Web Server (Nginx)
+### Task 6: Deploying a Web Server (Nginx)
 
-Goal: Spin up a web server inside a isolated LXC environment.
+**Goal:** Spin up a web server inside an isolated LXC environment.
 
-Commands:
-Bash
-sudo lxc-attach -n container-01 -- apt update && apt install -y nginx
+**Commands:**
+```bash
+sudo lxc-attach -n container-01 -- sh -c "apt update && apt install -y nginx"
 sudo lxc-attach -n container-01 -- systemctl enable --now nginx
 curl -I http://10.0.3.100
-
+```
 Deployed an Nginx web server inside container-01. Verified HTTP response headers from the host environment to confirm port binding and application readiness.
 
 ![Task 6](Screenshot-6.png)
 
-Task 7: SSH Access Configuration
+### Task 7: SSH Access Configuration
 
-Goal: Configure secure remote access directly into the LXC container.
+> **Security note:** The password `<LAB_PASSWORD>` was used only for demonstration purposes in the isolated laboratory environment. In a production environment, a strong unique password or SSH key-based authentication should be used instead.
 
-Commands:
-Bash
+**Goal:** Configure secure remote access directly into the LXC container.
+
+**Commands:**
+```bash
 sudo lxc-attach -n container-01 -- apt update
 sudo lxc-attach -n container-01 -- apt install -y openssh-server
-sudo lxc-attach -n container-01 -- bash -c "echo 'labuser:Password123\!' | chpasswd"
+sudo lxc-attach -n container-01 -- bash -c "echo 'labuser:<LAB_PASSWORD>' | chpasswd"
 ssh labuser@10.0.3.100
 
+```
 Configured OpenSSH daemon on the target container, created dedicated non-root credentials, and established a direct SSH session from the VirtualBox host machine.
 
-![Task 7](Screenshot-7.png)
+**Security note:** The password shown in the original laboratory exercise was a temporary test credential used exclusively in an isolated environment. It has not been reused for any production system or personal account.
 
-Task 8: Data Persistence and Bind Mounts
+![Task 7](Screenshot7.png)
 
-Goal: Mount host directories inside the container to preserve data across destructions.
+### Task 8: Data Persistence and Bind Mounts
 
-Commands:
-Bash
+**Goal:** Mount a host directory inside the container to preserve data independently of the container lifecycle.
+
+**Commands:**
+```bash
 mkdir -p /home/user/lxc-data
 echo "Persistent Storage Test" > /home/user/lxc-data/test.txt
+
+# Edit /var/lib/lxc/container-01/config
 sudo nano /var/lib/lxc/container-01/config
 
-# Add bind mount entry:
-  lxc.mount.entry = /home/user/lxc-data opt/host_data none bind,create=dir 0 0
+# Add the following bind mount entry:
+lxc.mount.entry = /home/user/lxc-data opt/host_data none bind,create=dir 0 0
 
+# Restart the container to apply the configuration
 sudo lxc-stop -n container-01
 sudo lxc-start -n container-01
-sudo lxc-attach -n container-01 -- cat /opt/host_data/test.txt
 
-Configured host-to-container bind mounting to decouple storage from the container lifecycle. Verified data persistence across container state reboots.
+# Verify the mounted data
+sudo lxc-attach -n container-01 -- cat /opt/host_data/test.txt
+```
+Configured a host-to-container bind mount to decouple persistent data from the container's filesystem. The data stored in the host directory was successfully accessed from inside the container, demonstrating persistence across container restarts.
 
 ![Task 8](Screenshot-8.png)
 
-Task 9: Vulnerability Testing Sandbox
-Goal: Isolate and test potentially unsafe software inside a sandbox environment.
-Commands:
-Bash
+### Task 9: Vulnerability Testing Sandbox
+
+**Goal:** Isolate and test potentially unsafe software inside a sandbox environment.
+
+**Commands:**
+```bash
 sudo lxc-attach -n container-01 -- apt update
 sudo lxc-attach -n container-01 -- apt install -y python3 git
 sudo lxc-attach -n container-01 -- git clone https://github.com/digininja/DVWA /var/www/html/dvwa
 sudo lxc-info -n container-01
-curl -I [http://10.0.3.100/dvwa/index.php](http://10.0.3.100/dvwa/index.php)
-
-Utilized LXC isolation properties to safely deploy an intentionally vulnerable application (DVWA) for security analysis, preventing exposure to the host system.
+curl -I http://10.0.3.100/dvwa/index.php
+```
+Utilized LXC isolation to deploy an intentionally vulnerable application (DVWA) in a controlled laboratory environment for security analysis, reducing the risk of affecting the host system.
 
 ![Task 9](Screenshot-9.png)
+
+
+### Conclusion
+
+Throughout this laboratory project, practical experience was gained in installing, configuring, managing, and utilizing LXC containers in an Ubuntu 26.04 LTS virtual environment. The laboratory activities covered the complete container lifecycle, starting with the creation and initialization of an LXC container and continuing with network configuration, resource management, container snapshots, and cloning.
+
+A static IP address was configured using the lxcbr0 virtual bridge, while cgroups v2 were used to limit the container's memory and CPU resources. The LXC command-line utilities were also explored to monitor container status, resource usage, and lifecycle events.
+
+The project also demonstrated how LXC containers can be used to host real services. An Nginx web server was deployed and tested inside the container, and SSH access was configured using a dedicated non-root user. Host-to-container bind mounts were implemented to provide persistent data storage independently of the container's lifecycle.
+
+Finally, the container was used as an isolated security testing environment for deploying DVWA, an intentionally vulnerable web application. This demonstrated how containerization can be useful for security research and testing while reducing the risk of directly affecting the host operating system.
+
+Overall, this laboratory provided a practical understanding of Linux containerization and LXC administration. The completed tasks demonstrated essential skills in container deployment, networking, resource control, service configuration, data persistence, monitoring, and security testing. These skills provide a solid foundation for working with containerized Linux environments and more advanced virtualization and infrastructure technologies.
