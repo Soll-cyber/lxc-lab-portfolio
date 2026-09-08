@@ -1,6 +1,6 @@
-# LXC Lab Portfolio: Hands-On Container Management
+# LXC Container Management Lab
 
-A hands-on Linux container management project demonstrating the deployment, configuration, monitoring, and security testing of LXC containers on Ubuntu 26.04 LTS running inside VirtualBox.
+A hands-on Linux containerization lab demonstrating LXC deployment, networking, resource management, service configuration, persistent storage, monitoring, and isolated security testing.
 
 ## Technologies
 
@@ -33,9 +33,9 @@ This project demonstrates:
 | Component | Configuration |
 |---|---|
 | Host environment | VirtualBox |
-| Operating system | Ubuntu 26.04 LTS |
+| Host OS | Ubuntu 26.04 LTS |
 | Container runtime | LXC |
-| Container | Ubuntu Noble / amd64 |
+| Container OS | Ubuntu 24.04 LTS (Noble), amd64 |
 | Container IP | 10.0.3.100 |
 | Network bridge | lxcbr0 |
 | Memory limit | 512 MB |
@@ -92,14 +92,26 @@ Modified the container configuration file to assign a static IP address (`10.0.3
 
 ### Task 3: Custom LXC Image Creation
 
-**Goal:** Customize a running container and create a reusable template/image.
+**Goal:** Customize a running container, create a filesystem snapshot, and use the snapshot to create a reusable clone.
 
 **Commands:**
 ```bash
+# Install additional tools inside the container
 sudo lxc-attach -n container-01 -- sh -c "apt update && apt install -y curl vim"
+
+# Stop the container before creating the snapshot
 sudo lxc-stop -n container-01
+
+# Create a snapshot named snap0
+sudo lxc-snapshot -n container-01
+
+# List available snapshots
 sudo lxc-snapshot -n container-01 -L
+
+# Create a new container from the snapshot
 sudo lxc-copy -n container-01 -N container-custom -s snap0
+
+# Start the cloned container
 sudo lxc-start -n container-custom
 ```
 Provisioned base tools (curl and vim) inside container-01. Created a filesystem snapshot and used it as the source for a cloned container named container-custom. The cloned container was then started successfully.
@@ -126,8 +138,7 @@ sudo cat /sys/fs/cgroup/lxc.payload.container-01/cpu.max
 sudo lxc-attach -n container-01 -- df -h /
 sudo lxc-attach -n container-01 -- free -m
 ```
-Enforced resource limits using cgroups v2. The container's maximum memory usage was restricted to 512 MB, while the CPU quota was limited to 50% of one CPU core.
-
+Enforced resource limits using cgroups v2. The container's maximum memory usage was restricted to 512 MB, while the CPU quota was limited to 50% of a single CPU core.
 ![Task 4](Screenshot-4.png)
 
 ### Task 5: LXC Command Line Toolset Exploration
@@ -175,9 +186,7 @@ ssh labuser@10.0.3.100
 ```
 Configured OpenSSH daemon on the target container, created dedicated non-root credentials, and established a direct SSH session from the VirtualBox host machine.
 
-**Security note:** The password shown in the original laboratory exercise was a temporary test credential used exclusively in an isolated environment. It has not been reused for any production system or personal account.
-
-![Task 7](Screenshot7.png)
+![Task 7](Screenshot-7-public.png)
 
 ### Task 8: Data Persistence and Bind Mounts
 
