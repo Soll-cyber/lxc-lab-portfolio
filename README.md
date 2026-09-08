@@ -41,11 +41,12 @@ This project demonstrates:
 | Memory limit | 512 MB |
 | CPU quota | 50% of one CPU |
 
+**Based on:** Hack The Box LXC lab — extended with additional configuration, testing, verification, and documentation.
 ---
 
 ### Task 1: Installation and First Container
 
-**Goal:** Install LXC tools and initialize a basic unprivileged container.
+**Goal:** Install LXC tools and initialize a basic LXC container.
 
 **Commands:**
 
@@ -102,10 +103,8 @@ sudo lxc-attach -n container-01 -- sh -c "apt update && apt install -y curl vim"
 # Stop the container before creating the snapshot
 sudo lxc-stop -n container-01
 
-# Create a snapshot named snap0
+# Create a filesystem snapshot and verify its assigned snapshot name.
 sudo lxc-snapshot -n container-01
-
-# List available snapshots
 sudo lxc-snapshot -n container-01 -L
 
 # Create a new container from the snapshot
@@ -120,7 +119,7 @@ Provisioned base tools (curl and vim) inside container-01. Created a filesystem 
 
 ### Task 4: Resource Limits Management
 
-**Goal:** Restrict CPU cores and RAM usage using Control Groups (cgroups).
+**Goal:** Configure CPU, memory, and storage resource limits using cgroups and LXC configuration.
 
 **Commands:**
 ```bash
@@ -139,6 +138,7 @@ sudo lxc-attach -n container-01 -- df -h /
 sudo lxc-attach -n container-01 -- free -m
 ```
 Enforced resource limits using cgroups v2. The container's maximum memory usage was restricted to 512 MB, while the CPU quota was limited to 50% of a single CPU core.
+
 ![Task 4](Screenshot-4.png)
 
 ### Task 5: LXC Command Line Toolset Exploration
